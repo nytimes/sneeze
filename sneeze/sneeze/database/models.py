@@ -271,7 +271,7 @@ def add_models(Base_=Base):
         
         id = Column(Integer, primary_key=True)
         name = Column(String(75))
-        password_crypt = Column(String(70), nullable=True)
+        password_crypt = Column(String(80), nullable=True)
         
         @property
         def password(self):
