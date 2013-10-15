@@ -234,7 +234,7 @@ def add_models(Base_=Base):
         def create_time(self):
             
             if not self._create_time.microsecond:
-                return self._create_time + timedelta(microsecond=self.create_micros)
+                return self._create_time + timedelta(microseconds=self.create_micros)
             else:
                 return self._create_time
         
