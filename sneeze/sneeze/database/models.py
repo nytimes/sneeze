@@ -52,7 +52,7 @@ def add_models(Base_=Base):
         __tablename__ = 'testCase'
         
         id = Column(Integer, primary_key=True)
-        label = Column(String)
+        label = Column(String(200))
         
         def __init__(self, label=''):
             
@@ -95,7 +95,7 @@ def add_models(Base_=Base):
         __tablename__ = 'testCaseExecution'
         
         id = Column(Integer, primary_key=True)
-        description = Column(String)
+        description = Column(String(300))
         result = Column(Enum('PENDING', 'PASS', 'FAIL', 'SKIP'))
         execution_batch_id = Column(Integer, ForeignKey('executionBatch.id'))
         execution_batch = relationship('ExecutionBatch', backref='case_executions')
@@ -149,7 +149,7 @@ def add_models(Base_=Base):
         __tablename__ = 'testCaseExecutionAddressPart'
         
         id = Column(Integer, primary_key=True)
-        part = Column(String)
+        part = Column(String(200))
         case_execution_id = Column(Integer, ForeignKey('testCaseExecution.id'))
         case_execution = relationship(CaseExecution, backref='address_parts')
     
@@ -158,11 +158,11 @@ def add_models(Base_=Base):
         __tablename__ = 'executionBatch'
         
         id = Column(Integer, primary_key=True)
-        environment = Column(String)
-        host = Column(String)
+        environment = Column(String(2000))
+        host = Column(String(150))
         start_time = Column(DateTime)
         end_time = Column(DateTime, nullable=True)
-        arguments = Column(String)
+        arguments = Column(String(2000))
         default_case_id = Column(Integer, ForeignKey('testCase.id'))
         default_case = relationship(Case)
         
@@ -208,8 +208,8 @@ def add_models(Base_=Base):
         __tablename__ = 'testCycle'
         
         id = Column(Integer, primary_key=True)
-        name = Column(String)
-        description = Column(String)
+        name = Column(String(100))
+        description = Column(String(300))
         case_executions = association_proxy('case_execution_associations', 'case_execution',
                                             creator=TestCycleCaseExecution._link_creator)
         running_count = Column(Integer)
@@ -223,7 +223,7 @@ def add_models(Base_=Base):
         user_id = Column(Integer, ForeignKey('user.id'))
         user = relationship('User', backref='tokens')
         create_time = Column(DateTime)
-        value = Column(String)
+        value = Column(String(44))
         remaining_uses = Column(Integer, nullable=True)
         expires = Column(DateTime, nullable=True)
         revoked = Column(Boolean)
@@ -270,8 +270,8 @@ def add_models(Base_=Base):
         __tablename__ = 'user'
         
         id = Column(Integer, primary_key=True)
-        name = Column(String)
-        password_crypt = Column(String, nullable=True)
+        name = Column(String(75))
+        password_crypt = Column(String(70), nullable=True)
         
         @property
         def password(self):
