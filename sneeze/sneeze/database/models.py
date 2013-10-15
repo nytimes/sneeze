@@ -222,11 +222,26 @@ def add_models(Base_=Base):
         id = Column(Integer, primary_key=True)
         user_id = Column(Integer, ForeignKey('user.id'))
         user = relationship('User', backref='tokens')
-        create_time = Column(DateTime)
+        _create_time = Column(DateTime)
+        create_micros = Column(Integer)
         value = Column(String(44))
         remaining_uses = Column(Integer, nullable=True)
         expires = Column(DateTime, nullable=True)
         revoked = Column(Boolean)
+        
+        @property
+        def create_time(self):
+            
+            if not self._create_time.microsecond:
+                return self._create_time + timedelta(microsecond=self.create_micros)
+            else:
+                return self._create_time
+        
+        @create_time.setter
+        def create_time(self, time):
+            
+            self._create_time = time
+            self.create_micros = time.microsecond
         
         @property
         def expired(self):
