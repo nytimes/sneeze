@@ -5,6 +5,7 @@ from sqlalchemy.ext.associationproxy import association_proxy
 from datetime import datetime
 from sqlalchemy import event
 from passlib.hash import bcrypt, sha256_crypt
+from datetime import timedelta
 
 Base = declarative_base()
 
