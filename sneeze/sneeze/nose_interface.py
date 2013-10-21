@@ -50,15 +50,15 @@ class Sneeze(Plugin):
                           help='username for pocket change user.')
         parser.add_option('--pocket-change-password',
                           action='store',
-                          default=env.get('pocket_change_password', ''),
+                          default='',
                           dest='pocket_change_password',
                           help='password for pocket change user.')
         parser.add_option('--pocket-change-token',
                           action='store',
-                          default=env.get('pocket_change_username', ''),
+                          default=env.get('pocket_change_token', ''),
                           dest='pocket_change_token',
                           help='token for pocket change user.')
-        parser.add_option('--pocket-environment-envvar',
+        parser.add_option('--pocket-change-environment-envvar',
                           action='store',
                           default='TEST_ENVIRONMENT',
                           dest='pocket_change_environment_envvar',

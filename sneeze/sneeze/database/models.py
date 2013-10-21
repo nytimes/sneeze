@@ -35,7 +35,7 @@ EXECUTION_STATUSES = ReverseMappingTuple(('RUNNING', 'COMPLETE', 'ZOMBIE'))
 
 def encryption_rounds(timestamp):
     
-    # minmum 5001 rounds to avoid passlib.hash.sha256_crypt magic behavior at 5000 rounds
+    # minimum 5001 rounds to avoid passlib.hash.sha256_crypt magic behavior at 5000 rounds
     rounds = int((float(timestamp.month + timestamp.second) / float(timestamp.day + timestamp.minute)) * 455091)
     while rounds > 65536:
         rounds = rounds >> 1
