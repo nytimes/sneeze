@@ -74,7 +74,8 @@ class Sneeze(Plugin):
             self.tissue = Tissue(options.reporting_db_config, options.test_cycle_name,
                                  options.test_cycle_description, environment,
                                  socket.gethostbyaddr(socket.gethostname())[0],
-                                 ' '.join(sys.argv), test_cycle_id=options.test_cycle_id)
+                                 ' '.join(sys.argv), test_cycle_id=options.test_cycle_id,
+                                 rerun_execution_ids=options.case_execution_reruns)
             Sneeze.enabled = True
             for Manager in pkg_resources.iter_entry_points(group='nose.plugins.sneeze.plugins.managers'):
                 Manager = Manager.load()
@@ -92,31 +93,14 @@ class Sneeze(Plugin):
                                        .all())
                     noseconfig.testNames = []
                     for case_execution in case_executions:
-                        Case = self.tissue.db_models['Case']
-                        cases = session.query(Case).filter(Case.id.in_([case_execution.case_id])).all()
-                        for case in cases:
-                            name = '{}:{}'.format(*[p.part for p in case_execution.address_parts[::2]])
-                            generative_args = '.'.join(filter(lambda x: x not in name, case.label.split('.')))
-                            name = '%s.%s' % (name, generative_args)
-                            noseconfig.testNames.append(name)
+                        name = '{}:{}'.format(*[p.part for p in case_execution.address_parts[::2]])
+                        noseconfig.testNames.append(name)
         else:
             self.tissue = None
     
     def startTest(self, test):
-        adr = test.address()
-        if test.test.arg:
-            for fn in test.test.arg:
-                if hasattr(fn, '__name__'):
-                    name = (fn.__name__,)
-                else:
-                    name = (str(fn),)  # ('User',)
-                adr = adr + name
-        test.unique_id = '.'.join(adr[1:])
         
-        try:
-            case_label = test.unique_id
-        except AttributeError:
-            case_label = '.'.join(test.address()[1:])
+        case_label = '.'.join(test.address()[1:])
         self.tissue.enter_case(case_label, test.address(), test.test.shortDescription())
     
     def formatError(self, test, err):

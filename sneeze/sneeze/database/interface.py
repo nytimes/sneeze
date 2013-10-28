@@ -33,7 +33,7 @@ class Tissue(object):
     def __init__(self, db_config_string, test_cycle_name, test_cycle_description,
                  environment, host, command_line_arguments, start_time=None,
                  test_cycle_id=None, declarative_base=Base, engine=None,
-                 session_factory=None):
+                 session_factory=None, rerun_execution_ids=[]):
         
         self.access_lock = Lock()
         self.access_lock.acquire()
@@ -55,6 +55,21 @@ class Tissue(object):
             self.session_factory = session_factory
         session = self.session_factory()
         TestCycle = self.db_models['TestCycle']
+        CaseExecution = self.db_models['CaseExecution']
+        if rerun_execution_ids and not test_cycle_id and not test_cycle_name:
+            case_executions = (session.query(CaseExecution)
+                               .filter(CaseExecution.id.in_(rerun_execution_ids))
+                               .all())
+            if case_executions[0].test_cycles:
+                cycle_ids = set(cycle.id for cycle in case_executions[0].test_cycles)
+                for case_execution in case_executions[1:]:
+                    if case_execution.test_cycles:
+                        cycle_ids.intersection_update(cycle.id for cycle in case_execution.test_cycles)
+                    else:
+                        break
+                else:
+                    if len(cycle_ids) == 1:
+                        test_cycle_id = cycle_ids.pop()
         if test_cycle_id:
             self.test_cycle = session.query(TestCycle).filter(TestCycle.id==test_cycle_id).one()
             self.test_cycle.running_count += 1
