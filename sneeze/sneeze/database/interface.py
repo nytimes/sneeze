@@ -28,6 +28,19 @@ class SessionTransaction(object):
         return False
 
 
+# Multiprocess support
+# TODO: Less hacky please...
+_db_models = {}
+
+def _get_models(base, adders):
+    
+    global _db_models
+    if not _db_models:
+        for adder in adders:
+            _db_models.update(adder(base))
+    return _db_models
+
+
 class Tissue(object):
     
     def __init__(self, db_config_string, test_cycle_name, test_cycle_description,
@@ -35,6 +48,8 @@ class Tissue(object):
                  test_cycle_id=None, declarative_base=Base, engine=None,
                  session_factory=None, rerun_execution_ids=[]):
         
+#        if declarative_base is None:
+#            declarative_base = base()
         self.access_lock = Lock()
         self.access_lock.acquire()
         if engine is None:
@@ -44,9 +59,10 @@ class Tissue(object):
         # To play nice with SQLAlchemy web framework integration, we have to wrap
         # the models in functions that take a declarative base, so we call that function
         # here for the core Sneeze models here
-        self.db_models = add_models(declarative_base)
+        adders = [add_models]
         for ext_add_models in pkg_resources.iter_entry_points(group='nose.plugins.sneeze.plugins.add_models'):
-            self.db_models.update(ext_add_models.load()(declarative_base))
+            adders.append(ext_add_models.load())
+        self.db_models = _get_models(declarative_base, adders)
         self.plugin_managers = []
         declarative_base.metadata.create_all(engine)
         if session_factory is None:

@@ -1,4 +1,5 @@
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.ext.declarative import declarative_base#, DeclarativeMeta
+#from sqlalchemy.ext.declarative.api import _declarative_constructor
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, Enum, DateTime
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.associationproxy import association_proxy
@@ -6,7 +7,23 @@ from datetime import datetime
 from sqlalchemy import event
 from passlib.hash import bcrypt, sha256_crypt
 from datetime import timedelta
+from multiprocessing import current_process
+from collections import defaultdict
 
+
+#def _declarative_base():
+#    
+#    name = 'Base_%s' % current_process().ident
+#    print name
+#    return declarative_base(name=name)
+#
+#_base_registry = defaultdict(_declarative_base)
+#
+#def base():
+#    
+#    global _base_registry
+#    return _base_registry[current_process().ident]
+    
 Base = declarative_base()
 
 
@@ -47,7 +64,10 @@ def encryption_rounds(timestamp):
 
 
 def add_models(Base_=Base):
-
+    
+#    if Base_ is None:
+#        Base_ = base()
+    
     class Case(Base_):
         
         __tablename__ = 'testCase'
