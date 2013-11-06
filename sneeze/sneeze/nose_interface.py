@@ -75,13 +75,9 @@ class Sneeze(Plugin):
             try:
                 test_cycle_id = noseconfig.test_cycle_id
             except AttributeError:
-                with open('/home/silas/kaichu/data/debugit', 'a') as f:
-                    f.write('%s ex %s\n' % (current_process().ident, options.test_cycle_id))
                 test_cycle_id = options.test_cycle_id
                 rerun_execution_ids = []
             else:
-                with open('/home/silas/kaichu/data/debugit', 'a') as f:
-                    f.write('%s %s\n' % (current_process().ident, noseconfig.test_cycle_id))
                 rerun_execution_ids = options.case_execution_reruns
             self.tissue = Tissue(options.reporting_db_config, options.test_cycle_name,
                                  options.test_cycle_description, environment,
@@ -89,10 +85,6 @@ class Sneeze(Plugin):
                                  ' '.join(sys.argv), test_cycle_id=test_cycle_id,
                                  rerun_execution_ids=rerun_execution_ids)
             noseconfig.test_cycle_id = self.tissue.test_cycle.id
-            with open('/home/silas/kaichu/data/debugit', 'a') as f:
-                    f.write('%s sav %s %s\n' % (current_process().ident,
-                                                self.tissue.test_cycle.id,
-                                                noseconfig.test_cycle_id))
             Sneeze.enabled = True
             for Manager in pkg_resources.iter_entry_points(group='nose.plugins.sneeze.plugins.managers'):
                 Manager = Manager.load()
