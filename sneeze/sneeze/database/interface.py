@@ -136,11 +136,16 @@ class Tissue(object):
             # should end PASSED (or PENDING)
             if (self.case_execution and self.execution_batch
                 and self.case_execution.case.id == self.execution_batch.default_case.id):
+                self.case_execution.end_time = datetime.now()
                 self.case_execution.result = 'PASS'
             Case = self.db_models['Case']
             if not isinstance(case, Case):
                 try:
-                    case = session.query(Case).filter(or_(Case.id==case, Case.label==case)).one()
+                    id_ = int(case)
+                except ValueError:
+                    id_ = 0
+                try:
+                    case = session.query(Case).filter(or_(Case.id==id_, Case.label==case)).one()
                 except NoResultFound:
                     case = Case(label=case)
             self.case_execution = self.db_models['CaseExecution'](case=case, description=description)
