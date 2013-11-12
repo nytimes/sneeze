@@ -70,7 +70,7 @@ def add_models(Base_=Base):
     
     class Case(Base_):
         
-        __tablename__ = 'testCase'
+        __tablename__ = 'test_case'
         
         id = Column(Integer, primary_key=True)
         label = Column(String(200))
@@ -82,10 +82,10 @@ def add_models(Base_=Base):
     
     class TestCycleCaseExecution(Base_):
         
-        __tablename__ = 'testCycleTestCaseExecution'
+        __tablename__ = 'test_cycle_test_case_execution'
         
-        test_cycle_id = Column(Integer, ForeignKey('testCycle.id'), primary_key=True)
-        case_execution_id = Column(Integer, ForeignKey('testCaseExecution.id'), primary_key=True)
+        test_cycle_id = Column(Integer, ForeignKey('test_cycle.id'), primary_key=True)
+        case_execution_id = Column(Integer, ForeignKey('test_case_execution.id'), primary_key=True)
         include_in_reporting = Column(Boolean)
         test_cycle = relationship('TestCycle', backref='case_execution_associations')
         case_execution = relationship('CaseExecution', backref='test_cycle_associations')
@@ -113,14 +113,14 @@ def add_models(Base_=Base):
     
     class CaseExecution(Base_):
         
-        __tablename__ = 'testCaseExecution'
+        __tablename__ = 'test_case_execution'
         
         id = Column(Integer, primary_key=True)
         description = Column(String(300))
         result = Column(Enum('PENDING', 'PASS', 'FAIL', 'SKIP'))
-        execution_batch_id = Column(Integer, ForeignKey('executionBatch.id'))
+        execution_batch_id = Column(Integer, ForeignKey('execution_batch.id'))
         execution_batch = relationship('ExecutionBatch', backref='case_executions')
-        case_id = Column(Integer, ForeignKey('testCase.id'))
+        case_id = Column(Integer, ForeignKey('test_case.id'))
         case = relationship(Case, backref='case_executions')
         start_time = Column(DateTime)
         end_time = Column(DateTime, nullable=True)
@@ -167,16 +167,16 @@ def add_models(Base_=Base):
     
     class CaseExecutionAddressPart(Base_):
         
-        __tablename__ = 'testCaseExecutionAddressPart'
+        __tablename__ = 'test_case_execution_address_part'
         
         id = Column(Integer, primary_key=True)
         part = Column(String(200))
-        case_execution_id = Column(Integer, ForeignKey('testCaseExecution.id'))
+        case_execution_id = Column(Integer, ForeignKey('test_case_execution.id'))
         case_execution = relationship(CaseExecution, backref='address_parts')
     
     class ExecutionBatch(Base_):
         
-        __tablename__ = 'executionBatch'
+        __tablename__ = 'execution_batch'
         
         id = Column(Integer, primary_key=True)
         environment = Column(String(2000))
@@ -184,7 +184,7 @@ def add_models(Base_=Base):
         start_time = Column(DateTime)
         end_time = Column(DateTime, nullable=True)
         arguments = Column(String(2000))
-        default_case_id = Column(Integer, ForeignKey('testCase.id'))
+        default_case_id = Column(Integer, ForeignKey('test_case.id'))
         default_case = relationship(Case)
         
         def __init__(self, environment, host, arguments='', start_time=None, default_case=None):
@@ -226,7 +226,7 @@ def add_models(Base_=Base):
     
     class TestCycle(Base_):
         
-        __tablename__ = 'testCycle'
+        __tablename__ = 'test_cycle'
         
         id = Column(Integer, primary_key=True)
         name = Column(String(100))
@@ -238,7 +238,7 @@ def add_models(Base_=Base):
     
     class UserToken(Base_):
         
-        __tablename__ = 'userToken'
+        __tablename__ = 'user_token'
         
         id = Column(Integer, primary_key=True)
         user_id = Column(Integer, ForeignKey('user.id'))
