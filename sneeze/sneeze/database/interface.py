@@ -48,14 +48,6 @@ class Tissue(object):
                  test_cycle_id=None, declarative_base=Base, engine=None,
                  session_factory=None, rerun_execution_ids=[]):
         
-        from multiprocessing import current_process
-        from inspect import stack, getframeinfo
-        from nose.plugins.multiprocess import _instantiate_plugins
-        with open('/home/silas/dmp/testout', 'a') as f:
-            f.write('%s %s %s %s\n' % (current_process().pid, test_cycle_name, test_cycle_id, _instantiate_plugins))
-            for frame in stack():
-                f.write('%s %s\n' % (current_process().pid, frame[1:4]))
-        
         self.access_lock = Lock()
         self.access_lock.acquire()
         if engine is None:
