@@ -70,40 +70,45 @@ class Sneeze(Plugin):
     def configure(self, options, noseconfig):
         
         if options.reporting_db_config:
-            environment = os.environ.get(options.pocket_change_environment_envvar,
-                                         '[no environment found]')
-            try:
-                test_cycle_id = noseconfig.test_cycle_id
-            except AttributeError:
-                test_cycle_id = options.test_cycle_id
-                rerun_execution_ids = []
-            else:
-                rerun_execution_ids = options.case_execution_reruns
-            self.tissue = Tissue(options.reporting_db_config, options.test_cycle_name,
-                                 options.test_cycle_description, environment,
-                                 socket.gethostbyaddr(socket.gethostname())[0],
-                                 ' '.join(sys.argv), test_cycle_id=test_cycle_id,
-                                 rerun_execution_ids=rerun_execution_ids)
-            noseconfig.test_cycle_id = self.tissue.test_cycle.id
-            Sneeze.enabled = True
-            for Manager in pkg_resources.iter_entry_points(group='nose.plugins.sneeze.plugins.managers'):
-                Manager = Manager.load()
-                if Manager.enabled(self.tissue, options, noseconfig):
-                    self.tissue.plugin_managers.append(Manager(self.tissue, options, noseconfig))
-            self.tissue.start()
-            for manager in self.tissue.plugin_managers:
-                if hasattr(manager, 'enter_test_cycle'):
-                    manager.enter_test_cycle()
-            if options.case_execution_reruns:
-                CaseExecution = self.tissue.db_models['CaseExecution']
-                with self.tissue.session_transaction() as session:
-                    case_executions = (session.query(CaseExecution)
-                                       .filter(CaseExecution.id.in_(options.case_execution_reruns))
-                                       .all())
-                    noseconfig.testNames = []
-                    for case_execution in case_executions:
-                        name = '{}:{}'.format(*[p.part for p in case_execution.address_parts[::2]])
-                        noseconfig.testNames.append(name)
+            # nose multiprocess configures plugins twice in each worker (once during unpickling config,
+            # once during __runner setting itself up.  It doesn't seem to make any sense that it does
+            # that, but it does, so we have to handle it in order to not end up with 2 Tissues (etc)
+            # created in each worker and thus ending up with orphaned sneeze plugins that do bad things.
+            if not (hasattr(self, 'tissue') and self.tissue):
+                environment = os.environ.get(options.pocket_change_environment_envvar,
+                                             '[no environment found]')
+                try:
+                    test_cycle_id = noseconfig.test_cycle_id
+                except AttributeError:
+                    test_cycle_id = options.test_cycle_id
+                    rerun_execution_ids = []
+                else:
+                    rerun_execution_ids = options.case_execution_reruns
+                self.tissue = Tissue(options.reporting_db_config, options.test_cycle_name,
+                                     options.test_cycle_description, environment,
+                                     socket.gethostbyaddr(socket.gethostname())[0],
+                                     ' '.join(sys.argv), test_cycle_id=test_cycle_id,
+                                     rerun_execution_ids=rerun_execution_ids)
+                noseconfig.test_cycle_id = self.tissue.test_cycle.id
+                Sneeze.enabled = True
+                for Manager in pkg_resources.iter_entry_points(group='nose.plugins.sneeze.plugins.managers'):
+                    Manager = Manager.load()
+                    if Manager.enabled(self.tissue, options, noseconfig):
+                        self.tissue.plugin_managers.append(Manager(self.tissue, options, noseconfig))
+                self.tissue.start()
+                for manager in self.tissue.plugin_managers:
+                    if hasattr(manager, 'enter_test_cycle'):
+                        manager.enter_test_cycle()
+                if options.case_execution_reruns:
+                    CaseExecution = self.tissue.db_models['CaseExecution']
+                    with self.tissue.session_transaction() as session:
+                        case_executions = (session.query(CaseExecution)
+                                           .filter(CaseExecution.id.in_(options.case_execution_reruns))
+                                           .all())
+                        noseconfig.testNames = []
+                        for case_execution in case_executions:
+                            name = '{}:{}'.format(*[p.part for p in case_execution.address_parts[::2]])
+                            noseconfig.testNames.append(name)
         else:
             self.tissue = None
             Sneeze.enabled = False
@@ -167,5 +172,9 @@ class Sneeze(Plugin):
         self.tissue.exit_case(self.exit_state)
     
     def finalize(self, result):
+        
+        self.tissue.exit()
+    
+    def stopWorker(self, config):
         
         self.tissue.exit()

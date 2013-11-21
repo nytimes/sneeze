@@ -48,8 +48,14 @@ class Tissue(object):
                  test_cycle_id=None, declarative_base=Base, engine=None,
                  session_factory=None, rerun_execution_ids=[]):
         
-#        if declarative_base is None:
-#            declarative_base = base()
+        from multiprocessing import current_process
+        from inspect import stack, getframeinfo
+        from nose.plugins.multiprocess import _instantiate_plugins
+        with open('/home/silas/dmp/testout', 'a') as f:
+            f.write('%s %s %s %s\n' % (current_process().pid, test_cycle_name, test_cycle_id, _instantiate_plugins))
+            for frame in stack():
+                f.write('%s %s\n' % (current_process().pid, frame[1:4]))
+        
         self.access_lock = Lock()
         self.access_lock.acquire()
         if engine is None:
@@ -58,7 +64,7 @@ class Tissue(object):
             engine = engine
         # To play nice with SQLAlchemy web framework integration, we have to wrap
         # the models in functions that take a declarative base, so we call that function
-        # here for the core Sneeze models here
+        # for the core Sneeze models here
         adders = [add_models]
         for ext_add_models in pkg_resources.iter_entry_points(group='nose.plugins.sneeze.plugins.add_models'):
             adders.append(ext_add_models.load())
