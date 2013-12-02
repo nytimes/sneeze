@@ -118,19 +118,20 @@ class Sneeze(Plugin):
         case_label = '.'.join(test.address()[1:])
         self.tissue.enter_case(case_label, test.address(), test.test.shortDescription())
     
-    def formatError(self, test, err):
-        
-        for manager in self.tissue.plugin_managers:
-            if hasattr(manager, 'peek_error'):
-                manager.peek_error(test, err)
-        return err
     
-    def formatFailure(self, test, err):
-        
+    def peekError(self, test, err):
+          
         for manager in self.tissue.plugin_managers:
             if hasattr(manager, 'peek_error'):
                 manager.peek_error(test, err)
-        return err
+    
+    def handleError(self, test, err):
+        
+        self.peekError(test, err)
+    
+    def handleFailure(self, test, err):
+        
+        self.peekError(test, err)
     
     def addError(self, test, err):
         
