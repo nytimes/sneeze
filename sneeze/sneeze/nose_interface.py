@@ -1,3 +1,16 @@
+'''The Sneeze class is the plugin for nose.  It provides the core command line options
+for controlling Sneeze behavior for a given nosetests execution.  Providing the
+:option:`--reporting-db-config` argument to nosetests enables Sneeze (and any of its
+enabled plugins) for the given nosetests execution.  The user must also provide either
+:option:`--test-cycle-name` and :option:`--test-cycle-description`, or a valid
+:option:`--test-cycle-id` for the tests to execute successfully, once Sneeze is enabled.
+
+The plugin starts the Tissue and connects the Sneeze API hooks to the nose plugin API.
+It also loads and initializes the plugin managers for any Sneeze plugins being used,
+and attaches them to the Tissue.
+'''
+
+
 from nose.plugins import Plugin
 from sneeze.database.interface import Tissue
 import os, sys, socket, pkg_resources
@@ -17,53 +30,63 @@ class Sneeze(Plugin):
                           action='store',
                           default=env.get('sneeze_db_config', ''),
                           dest='reporting_db_config',
+                          metavar='CONFIG_STRING',
                           help='SQLAlchemy formated connection string for reporting database.')
         parser.add_option('--test-cycle-name',
                           action='store',
                           dest='test_cycle_name',
+                          metavar='NAME',
                           help='Name of the test cycle being run.')
         parser.add_option('--test-cycle-description',
                           action='store',
                           default='',
                           dest='test_cycle_description',
+                          metavar='DESCRIPTION',
                           help='Description for the test cycle being run.')
         parser.add_option('--test-cycle-id',
                           action='store',
                           default=0,
                           dest='test_cycle_id',
+                          metavar='CYCLE_ID',
                           type=int,
                           help=('id of test cycle to run tests under.  '
-                                'Overrides --test-cycle-name and --test-cycle-description.'))
+                                'Overrides :option:`--test-cycle-name` and :option:`--test-cycle-description`.'))
         parser.add_option('--rerun-from-case-execution',
                           action='append',
                           dest='case_execution_reruns',
+                          metavar='EXECUTION_ID_LIST',
                           type=int,
                           help='Case execution id to base rerun upon.')
         parser.add_option('--pocket-change-host',
                           action='store',
                           default=env.get('pocket_change_host', ''),
                           dest='pocket_change_host',
+                          metavar='HOST',
                           help='url of associated pocket change server.')
         parser.add_option('--pocket-change-username',
                           action='store',
                           default=env.get('pocket_change_username', ''),
                           dest='pocket_change_username',
+                          metavar='USERNAME',
                           help='username for pocket change user.')
         parser.add_option('--pocket-change-password',
                           action='store',
                           default='',
                           dest='pocket_change_password',
+                          metavar='PASSWORD',
                           help='password for pocket change user.')
         parser.add_option('--pocket-change-token',
                           action='store',
                           default=env.get('pocket_change_token', ''),
                           dest='pocket_change_token',
+                          metavar='TOKEN',
                           help='token for pocket change user.')
         parser.add_option('--pocket-change-environment-envvar',
                           action='store',
                           default='TEST_ENVIRONMENT',
                           dest='pocket_change_environment_envvar',
-                          help='Name of environment variable to record as .')
+                          metavar='ENVIRONMENT_VAR_NAME',
+                          help='Name of environment variable to record as the test environment value.')
         for add_options in pkg_resources.iter_entry_points(group='nose.plugins.sneeze.plugins.add_options'):
             add_options.load()(parser, env)
     
