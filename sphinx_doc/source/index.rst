@@ -17,9 +17,9 @@ additional plugins.
 Installation and Quickstart
 ===========================
 
-First, install sneeze (with pip), then run any tests with nose using nosetests
-from the command line as you would normally, but with the following command
-line arguments:
+First, install Sneeze (pip install nose-sneeze), then run any tests with nose 
+using nosetests from the command line as you would normally, but with the 
+following command line arguments:
 
 * :option:`--reporting-db-config` An `SQLAlchemy formatted
   <http://docs.sqlalchemy.org/en/rel_0_8/core/engines.html#database-urls>`_
@@ -40,8 +40,10 @@ if an id is provided, it will always supersede any other :term:`Test Cycle`
 configurations.  The database config can also be stored more permanently by
 setting it on an environment variable named ``sneeze_db_config``.
 
-*To use in conjunction with the multiprocess plugin, you must use the following
-version of nose until the following pull request is merged:*
+*Be aware that do to nose being in maintenance mode, Sneeze relies on a custom
+version of nose, nose-for-sneeze.  It should work fine with normal nose as long
+as you don't attempt to use the multiprocess plugin.  Links to relevant fork 
+and pull request here:*
 
 * `nose with worker exit hook <https://github.com/silasray/nose>`_
 * `pull request <https://github.com/nose-devs/nose/pull/748>`_
