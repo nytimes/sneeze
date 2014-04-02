@@ -17,7 +17,7 @@ additional plugins.
 Installation and Quickstart
 ===========================
 
-First, install Sneeze (`pip install nose-sneeze`), then run any tests with nose 
+First, install Sneeze (``pip install nose-sneeze``), then run any tests with nose 
 using nosetests from the command line as you would normally, but with the 
 following command line arguments:
 
