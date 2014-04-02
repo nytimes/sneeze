@@ -48,6 +48,10 @@ and pull request here:*
 * `nose with worker exit hook <https://github.com/silasray/nose>`_
 * `pull request <https://github.com/nose-devs/nose/pull/748>`_
 
+Repo
+====
+https://github.com/NYTimes/sneeze
+
 Details
 =======
 
