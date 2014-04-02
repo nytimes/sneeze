@@ -11,7 +11,7 @@ setup(name='nose-sneeze',
       classifiers=['Development Status :: 4 - Beta',
                    'Intended Audience :: Information Technology',
                    'Topic :: Software Development :: Quality Assurance',
-                   'Topic :: Software Development :: Testing']
+                   'Topic :: Software Development :: Testing'],
       packages=find_packages(),
       install_requires=['SQLAlchemy',
                         'nose >= 1.2',
