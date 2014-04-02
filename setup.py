@@ -14,6 +14,6 @@ setup(name='nose-sneeze',
                    'Topic :: Software Development :: Testing'],
       packages=find_packages(),
       install_requires=['SQLAlchemy',
-                        'nose >= 1.2',
+                        'nose-for-sneeze',
                         'passlib'],
       entry_points={'nose.plugins.0.10' : ['sneeze = sneeze.nose_interface:Sneeze']})
