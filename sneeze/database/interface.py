@@ -148,11 +148,9 @@ class Tissue(object):
                         test_cycle_id = cycle_ids.pop()
         if test_cycle_id:
             self.test_cycle = session.query(TestCycle).filter(TestCycle.id==test_cycle_id).one()
-            self.test_cycle.running_count += 1
             session.commit()
         else:
-            self.test_cycle = TestCycle(name=test_cycle_name, description=test_cycle_description,
-                                        running_count=1)
+            self.test_cycle = TestCycle(name=test_cycle_name, description=test_cycle_description)
             session.add(self.test_cycle)
         self.execution_batch = self.db_models['ExecutionBatch'](environment=environment, host=host,
                                                         arguments=command_line_arguments,
@@ -289,7 +287,7 @@ class Tissue(object):
         with self.session_transaction():
             self.case_execution.result = 'PASS'
             self.case_execution.end_time = datetime.now()
-            self.test_cycle.running_count -= 1
+            self.execution_batch.end_time = datetime.now()
         for manager in self.plugin_managers:
             if hasattr(manager, 'exit_test_cycle'):
                 manager.exit_test_cycle()

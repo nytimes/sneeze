@@ -233,7 +233,10 @@ def add_models(Base_=Base):
         description = Column(String(300))
         case_executions = association_proxy('case_execution_associations', 'case_execution',
                                             creator=TestCycleCaseExecution._link_creator)
-        running_count = Column(Integer)
+        @property
+        def running_count(self):
+            
+            return len(set(_.execution_batch.id for _ in self.case_executions if _.execution_batch.end_time is None))
     
     
     class UserToken(Base_):
