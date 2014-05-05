@@ -235,11 +235,11 @@ class Tissue(object):
             Case = self.db_models['Case']
             if not isinstance(case, Case):
                 try:
-                    id_ = int(case)
+                    condition = Case.id==int(case)
                 except ValueError:
-                    id_ = 0
+                    condition = Case.label==case
                 try:
-                    case = session.query(Case).filter(or_(Case.id==id_, Case.label==case)).one()
+                    case = session.query(Case).filter(condition).one()
                 except NoResultFound:
                     case = Case(label=case)
             self.case_execution = self.db_models['CaseExecution'](case=case, description=description)
