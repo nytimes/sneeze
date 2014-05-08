@@ -73,7 +73,7 @@ def add_models(Base_=Base):
         __tablename__ = 'test_case'
         
         id = Column(Integer, primary_key=True)
-        label = Column(String(200))
+        label = Column(String(500))
         
         def __init__(self, label=''):
             

@@ -242,6 +242,8 @@ class Tissue(object):
                     case = session.query(Case).filter(condition).one()
                 except NoResultFound:
                     case = Case(label=case)
+                    session.add(case)
+                    session.commit()
             self.case_execution = self.db_models['CaseExecution'](case=case, description=description)
             self.execution_batch.case_executions.append(self.case_execution)
             self.test_cycle.case_executions.append(self.case_execution)
